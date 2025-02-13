@@ -1,8 +1,7 @@
-import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
-import 'package:login_app/conts.dart';
+import 'dart:convert';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -39,26 +38,43 @@ class _ChatPageState extends State<ChatPage> {
 
   void _sendMessage(ChatMessage chatMessage) {
     setState(() {
-      messages = [chatMessage, ...messages];
+      messages = [chatMessage, ...messages]; // Display user message immediately
     });
+
     try {
       String question = chatMessage.text;
-      gemini.streamGenerateContent(question).listen((event) {
-        ChatMessage? lastMessage = messages.firstOrNull;
-        if (lastMessage != null && lastMessage.user == geminiUser) {
-        } else {
-          String response = event.content?.parts
-                  ?.fold("", (previous, current) => "$previous$current") ??
-              "";
+
+      StringBuffer responseBuffer =
+          StringBuffer(); // Buffer to collect streamed parts
+
+      gemini.streamGenerateContent(question).listen(
+        (event) {
+          // Add each part to the buffer
+          String partText =
+              jsonDecode(jsonEncode(event.content?.parts?.first))['text'] ?? "";
+          responseBuffer
+              .write("${partText.trim()} "); // Append part and add space
+        },
+        onDone: () {
+          // Once the stream is done, update the UI with the full response
+          String finalResponse = responseBuffer.toString().trim();
+
           ChatMessage message = ChatMessage(
-              user: geminiUser, createdAt: DateTime.now(), text: response);
+            user: geminiUser,
+            createdAt: DateTime.now(),
+            text: finalResponse,
+          );
+
           setState(() {
-            messages = [messages, ...messages];
+            messages = [message, ...messages]; // Add full response to the chat
           });
-        }
-      });
+        },
+        onError: (error) {
+          print("Error: $error");
+        },
+      );
     } catch (e) {
-      print(e);
+      print("Exception: $e");
     }
   }
 }

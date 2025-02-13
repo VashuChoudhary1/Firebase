@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:login_app/home.dart';
+import 'package:get/get.dart';
 import 'package:login_app/login.dart';
+import 'package:login_app/wrapper.dart';
 
 class Registration extends StatefulWidget {
   const Registration({super.key});
@@ -10,17 +12,26 @@ class Registration extends StatefulWidget {
 }
 
 class _RegistrationState extends State<Registration> {
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
+  signup() async {
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email.text, password: password.text);
+    Get.offAll(WrapperPage());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.lightGreen,
       body: Center(
         child: Card(
+          margin: EdgeInsets.all(15),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
             side: BorderSide(
               color: Colors.black,
-              width: 3.0,
+              width: 2.0,
             ),
           ),
           child: SizedBox(
@@ -38,11 +49,12 @@ class _RegistrationState extends State<Registration> {
                       fontSize: 45,
                       fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 40),
+                SizedBox(height: 10),
                 Container(
                   padding: EdgeInsets.all(20),
                   width: 400,
                   child: TextField(
+                    controller: email,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -53,11 +65,12 @@ class _RegistrationState extends State<Registration> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 5),
                 Container(
                   padding: EdgeInsets.all(20),
                   width: 400,
                   child: TextField(
+                    controller: password,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -69,13 +82,10 @@ class _RegistrationState extends State<Registration> {
                   ),
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 5,
                 ),
                 ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => HomePage()));
-                    },
+                    onPressed: (() => signup()),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 15, 53, 17),
                     ),
@@ -87,32 +97,8 @@ class _RegistrationState extends State<Registration> {
                           fontSize: 20),
                     )),
                 SizedBox(
-                  height: 10,
+                  height: 5,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Already Registered ? ",
-                      style: TextStyle(color: Colors.black, fontSize: 10),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginPage()));
-                      },
-                      child: Text(
-                        "Log in ",
-                        style: TextStyle(color: Colors.blue, fontSize: 10),
-                      ),
-                    )
-                  ],
-                )
               ],
             ),
           ),

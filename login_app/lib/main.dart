@@ -1,10 +1,14 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
-import 'package:login_app/chat_page.dart';
 import 'package:login_app/conts.dart';
+import 'package:login_app/wrapper.dart';
+import 'package:get/get.dart';
 
-void main() {
+void main() async {
   Gemini.init(apiKey: GEMINI_API_KEY);
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -13,10 +17,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Authentication',
-      home: ChatPage(),
+      home: WrapperPage(),
     );
   }
 }
